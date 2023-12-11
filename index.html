@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>Herr Karlingers Schüler Roulette</title>
     <style>
 		body {
@@ -45,6 +46,32 @@
 		li {
 			width: 30%; /* Adjust the width as needed */
 			box-sizing: border-box;
+			position: relative;
+			display: flex;
+			align-items: center;
+			height: 40px; /* Adjust the height as needed */
+		}
+
+		button.remove-button {
+			background-color: #cc3333;
+			color: #fff;
+			padding: 5px;
+			font-size: 12px;
+			border: none;
+			border-radius: 3px;
+			cursor: pointer;
+			position: absolute;
+			top: 5px;
+			right: 5px;
+			transition: background-color 0.3s ease;
+		}
+
+		button.remove-button i {
+			font-size: 14px;
+		}
+
+		button.remove-button:hover {
+			background-color: #990000;
 		}
 
 		label {
@@ -148,6 +175,31 @@
 			}
 		}
 
+		@keyframes fireworks {
+			0% {
+				transform: scale(0.1);
+				opacity: 0;
+			}
+			100% {
+				transform: scale(1);
+				opacity: 1;
+			}
+		}
+
+		#selectedName.animated {
+			animation: fireworks 2s ease-out;
+		}
+
+		.confetti {
+			position: absolute;
+			width: 10px;
+			height: 10px;
+			background-color: #e74c3c;
+			border-radius: 50%;
+			transform-origin: 50% 50%;
+			animation: confetti-burst 1s ease-out;
+		}
+
 		input[type="text"] {
 			padding: 8px;
 			font-size: 16px;
@@ -174,6 +226,7 @@
         </div>
 
         <button onclick="selectRandomName()">Wähle das Opfer</button>
+        <button onclick="resetSelection()">Auswahl zurücksetzen</button>
 
         <p id="selectedName"></p>
         <div id="loadingAnimation">
@@ -206,11 +259,20 @@
         names.forEach(function(name, index) {
             var listItem = document.createElement('li');
             listItem.innerHTML = '<input type="checkbox" id="name' + (index + 1) + '" checked> <label for="name' + (index + 1) + '">' + name + '</label>';
+			
+			var removeButton = document.createElement('button');
+        	removeButton.className = 'remove-button';
+			removeButton.innerHTML = '<i class="fas fa-trash"></i>';
+			removeButton.onclick = function() {
+				removeName(newName);
+			};
+			listItem.appendChild(removeButton);
+
             nameList.appendChild(listItem);
         });
 
 		// Shuffle the names array
-		names.sort(function () {
+		names = names.sort(function () {
 			return 0.5 - Math.random();
 		});
 
@@ -240,7 +302,7 @@
 							return 0.5 - Math.random();
 						});
 					}
-					var selectedName = checkedCheckboxes[currentIndex].nextElementSibling.textContent;
+					var selectedName = names[currentIndex];
 
                     // Display the selected name with animation
                     selectedNameElement.textContent = 'Auserwählter Schüler: ' + selectedName;
@@ -281,11 +343,52 @@
                 var nameList = document.getElementById('nameList');
                 var listItem = document.createElement('li');
                 listItem.innerHTML = '<input type="checkbox" id="name' + names.length + '" checked> <label for="name' + names.length + '">' + newName + '</label>';
+
+				var removeButton = document.createElement('button');
+				removeButton.innerHTML = '<i class="fas fa-trash"></i>';
+				removeButton.onclick = function() {
+					removeName(newName);
+				};
+        		removeButton.className = 'remove-button';
+				listItem.appendChild(removeButton);
+
                 nameList.appendChild(listItem);
             } else {
                 alert('Bitte geben Sie einen Namen ein.');
             }
         }
+
+		function removeName(name) {
+			// Remove the name from the array
+			var index = names.indexOf(name);
+			if (index !== -1) {
+				names.splice(index, 1);
+
+				// Remove the name from the list
+				var listItem = document.querySelector('li:contains("' + name + '")');
+				listItem.remove();
+			}
+		}
+
+		function resetSelection() {
+			// Reset the selection process
+			currentIndex = 0;
+
+			// Uncheck all checkboxes
+			var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+			checkboxes.forEach(checkbox => {
+				checkbox.checked = true;
+			});
+
+			// Clear the displayed selected name
+			var selectedNameElement = document.getElementById('selectedName');
+			selectedNameElement.textContent = '';
+
+			// Shuffle the names array
+			names.sort(function () {
+				return 0.5 - Math.random();
+			});
+		}
     </script>
 </body>
 </html>
