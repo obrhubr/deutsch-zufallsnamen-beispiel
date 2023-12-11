@@ -199,6 +199,8 @@
 			"Noah"
 		];
 
+		names.sort()
+
         // Generate the list dynamically
         var nameList = document.getElementById('nameList');
         names.forEach(function(name, index) {
@@ -206,6 +208,13 @@
             listItem.innerHTML = '<input type="checkbox" id="name' + (index + 1) + '" checked> <label for="name' + (index + 1) + '">' + name + '</label>';
             nameList.appendChild(listItem);
         });
+
+		// Shuffle the names array
+		names.sort(function () {
+			return 0.5 - Math.random();
+		});
+
+		var currentIndex = 0;
 
         function selectRandomName() {
             // Show loading spinner
@@ -224,8 +233,14 @@
                 var checkedCheckboxes = Array.from(checkboxes).filter(checkbox => checkbox.checked);
 
                 if (checkedCheckboxes.length > 0) {
-                    var randomIndex = Math.floor(Math.random() * checkedCheckboxes.length);
-                    var selectedName = checkedCheckboxes[randomIndex].nextElementSibling.textContent;
+                    if (currentIndex >= checkedCheckboxes.length) {
+						// If all students have been selected, reset the index and shuffle again
+						currentIndex = 0;
+						names.sort(function () {
+							return 0.5 - Math.random();
+						});
+					}
+					var selectedName = checkedCheckboxes[currentIndex].nextElementSibling.textContent;
 
                     // Display the selected name with animation
                     selectedNameElement.textContent = 'Auserwählter Schüler: ' + selectedName;
@@ -239,6 +254,8 @@
 
                     // Add the animation class
                     selectedNameElement.classList.add('animated');
+
+					currentIndex++;
                 } else {
                     selectedNameElement.textContent = 'Bitte wähle mindestens einen Schüler aus.';
                 }
@@ -252,6 +269,10 @@
             if (newName !== '') {
                 // Add the new name to the names array
                 names.push(newName);
+
+				names.sort(function () {
+					return 0.5 - Math.random();
+				});
 
                 // Clear the input field
                 newNameInput.value = '';
