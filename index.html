@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Herr Karlingers Schüler Roulette</title>
+    <style>
+		body {
+			font-family: 'Comic Sans MS', cursive, sans-serif;
+			background-color: #ffeecc;
+			margin: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+		}
+
+		#container {
+			background-color: #ffd699;
+			padding: 20px;
+			border-radius: 10px;
+			box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+			text-align: center;
+		}
+
+		h1 {
+			color: #b35900;
+		}
+
+		div {
+			margin-bottom: 50px;
+		}
+
+		ul {
+			list-style: none;
+			padding: 0;
+		}
+
+		#nameList {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: space-around;
+		}
+
+		li {
+			width: 30%; /* Adjust the width as needed */
+			box-sizing: border-box;
+		}
+
+		label {
+			cursor: pointer;
+			position: relative;
+			padding-left: 35px;
+			cursor: pointer;
+			display: inline-block;
+			font-size: 16px;
+			margin-bottom: 12px;
+			color: #b35900;
+		}
+
+		label::before {
+			content: '';
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 20px;
+			height: 20px;
+			background-color: #ffcc66;
+			border-radius: 5px;
+		}
+
+		label::after {
+			content: '';
+			position: absolute;
+			left: 7px;
+			top: 7px;
+			width: 6px;
+			height: 10px;
+			border: solid white;
+			border-width: 0 2px 2px 0;
+			transform: rotate(45deg);
+			display: none;
+		}
+
+		input[type="checkbox"] {
+			display: none;
+		}
+
+		input[type="checkbox"]:checked + label::after {
+			display: block;
+		}
+
+		button {
+			background-color: #b35900;
+			color: #fff;
+			padding: 10px 20px;
+			font-size: 16px;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+			transition: background-color 0.3s ease;
+		}
+
+		button:hover {
+			background-color: #994d00;
+		}
+
+		#selectedName {
+			font-size: 3em;
+			display: none;
+			animation: revealName 0.5s ease-out;
+			margin-top: 20px;
+			color: #b35900;
+		}
+
+		#loadingAnimation {
+			display: none;
+			margin-top: 20px;
+		}
+
+		.spinner {
+			margin: 0 auto;
+			width: 40px;
+			height: 40px;
+			border-radius: 50%;
+			border: 4px solid transparent;
+			border-top-color: #b35900;
+			animation: spin 1s linear infinite;
+		}
+
+		@keyframes spin {
+			0% {
+				transform: rotate(0deg);
+			}
+			100% {
+				transform: rotate(360deg);
+			}
+		}
+
+		@keyframes revealName {
+			from {
+				opacity: 0;
+				transform: translateY(-20px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		input[type="text"] {
+			padding: 8px;
+			font-size: 16px;
+			border: 2px solid #b35900;
+			border-radius: 5px;
+			margin-right: 10px;
+		}
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Herr Karlingers Schüler Roulette</h1>
+
+		<div>
+			<ul id="nameList">
+				<!-- Names will be dynamically added here -->
+			</ul>
+		</div>
+
+		<div>
+            <label for="newName">Neuer Schüler: </label>
+            <input type="text" id="newName" />
+            <button onclick="addNewName()">Hinzufügen</button>
+        </div>
+
+        <button onclick="selectRandomName()">Wähle das Opfer</button>
+
+        <p id="selectedName"></p>
+        <div id="loadingAnimation">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <script>
+        // Define names in a JavaScript array
+        var names = [
+			"Vivien", 
+			"Max", 
+			"Niklas", 
+			"Flavia", 
+			"Lina", 
+			"Alma", 
+			"Camila", 
+			"Kyra", 
+			"Leonard", 
+			"Anaïs", 
+			"Ali", 
+			"Sebastian", 
+			"Noah"
+		];
+
+        // Generate the list dynamically
+        var nameList = document.getElementById('nameList');
+        names.forEach(function(name, index) {
+            var listItem = document.createElement('li');
+            listItem.innerHTML = '<input type="checkbox" id="name' + (index + 1) + '" checked> <label for="name' + (index + 1) + '">' + name + '</label>';
+            nameList.appendChild(listItem);
+        });
+
+        function selectRandomName() {
+            // Show loading spinner
+            var loadingAnimation = document.getElementById('loadingAnimation');
+            loadingAnimation.style.display = 'block';
+
+            // Hide previous selected name
+            var selectedNameElement = document.getElementById('selectedName');
+            selectedNameElement.style.display = 'none';
+
+            // Hide loading spinner after 2 seconds
+            setTimeout(function() {
+                loadingAnimation.style.display = 'none';
+
+                var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                var checkedCheckboxes = Array.from(checkboxes).filter(checkbox => checkbox.checked);
+
+                if (checkedCheckboxes.length > 0) {
+                    var randomIndex = Math.floor(Math.random() * checkedCheckboxes.length);
+                    var selectedName = checkedCheckboxes[randomIndex].nextElementSibling.textContent;
+
+                    // Display the selected name with animation
+                    selectedNameElement.textContent = 'Auserwählter Schüler: ' + selectedName;
+                    selectedNameElement.style.display = 'block';
+
+                    // Clear the animation class to trigger it again on the next selection
+                    selectedNameElement.classList.remove('animated');
+
+                    // Trigger reflow to restart the animation
+                    void selectedNameElement.offsetWidth;
+
+                    // Add the animation class
+                    selectedNameElement.classList.add('animated');
+                } else {
+                    selectedNameElement.textContent = 'Bitte wähle mindestens einen Schüler aus.';
+                }
+            }, 1000);
+        }
+
+		function addNewName() {
+            var newNameInput = document.getElementById('newName');
+            var newName = newNameInput.value.trim();
+
+            if (newName !== '') {
+                // Add the new name to the names array
+                names.push(newName);
+
+                // Clear the input field
+                newNameInput.value = '';
+
+                // Add the new name to the list dynamically
+                var nameList = document.getElementById('nameList');
+                var listItem = document.createElement('li');
+                listItem.innerHTML = '<input type="checkbox" id="name' + names.length + '" checked> <label for="name' + names.length + '">' + newName + '</label>';
+                nameList.appendChild(listItem);
+            } else {
+                alert('Bitte geben Sie einen Namen ein.');
+            }
+        }
+    </script>
+</body>
+</html>
